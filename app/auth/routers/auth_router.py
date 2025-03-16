@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.dependencies import get_db
 from app.auth.schemas.auth_schema import LoginRequest, SignUpRequest
-from app.auth.services.auth_service import sign_up
+from app.auth.services import auth_service
 
 # 설정 값들
 SECRET_KEY = "mysecretkey"
@@ -37,19 +37,15 @@ fake_users_db = {
 }
 
 @router.post("/auth/sign-up")
-def login(sign_up_request: SignUpRequest, db: Session = Depends(get_db)):
-    sign_up(db, sign_up_request)
+def sign_up(sign_up_request: SignUpRequest, db: Session = Depends(get_db)):
+    auth_service.sign_up(db, sign_up_request)
 
 
 @router.post("/auth/login")
-def login(login_schema: LoginRequest):
-    print(login_schema.dict())
-    # user = fake_users_db.get(form_data.username)
-    # if not user or user["password"] != form_data.password:
-    #     raise HTTPException(status_code=401, detail="Incorrect username or password")
-    
-    # access_token = create_access_token(data={"sub": form_data.username})
-    # access_token = create_access_token(data={"sub": "test"})
+def login(login_request: LoginRequest, db: Session = Depends(get_db)):
+    auth_service.login(db, login_request)
+
+    access_token = create_access_token(data={"sub": login_request.username})
     
     # # JWT 토큰을 쿠키에 설정
     # response = JSONResponse(content={"message": "Login successful"})

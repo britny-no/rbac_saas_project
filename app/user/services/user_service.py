@@ -4,8 +4,8 @@ from sqlalchemy.orm import Session
 from ..models.user import User
 from ..schemas.user_schema import UserCreate
 
-def get_user(db: Session, user_id: int):
-    db_user = db.query(User).filter(User.id == user_id).first()
+def get_user(db: Session, email: str):
+    db_user = db.query(User).filter(User.email == email).first()
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return db_user

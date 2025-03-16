@@ -3,7 +3,7 @@ from pydantic import BaseModel, validator
 from app.enums import UserRoleEnum
 
 class LoginRequest(BaseModel):
-    username: str
+    email: str
     password: str
 
 
