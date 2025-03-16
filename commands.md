@@ -35,3 +35,7 @@ alembic upgrade head
 ## 적용된 마이그레이션 되돌리는 명령어
 
 alembic downgrade -1
+
+## 테스트 코드 명령어
+
+PYTHONPATH=. pytest tests
