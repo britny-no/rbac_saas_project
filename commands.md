@@ -39,3 +39,7 @@ alembic downgrade -1
 ## 테스트 코드 명령어
 
 PYTHONPATH=. pytest tests
+
+## 개발 서버
+
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload

@@ -20,3 +20,7 @@ class User(Base):
         if role not in [item.value for item in UserRoleEnum]:
             raise ValueError(f"Invalid role: {role}")
         return role
+
+
+    def as_dict(self):
+        return {column.name: getattr(self, column.name) for column in self.__table__.columns}
