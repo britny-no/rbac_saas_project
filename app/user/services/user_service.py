@@ -11,7 +11,7 @@ def get_user(db: Session, user_id: int):
     return db_user
 
 def create_user(db: Session, user: UserCreate):
-    db_user = User(username=user.username, email=user.email, full_name=None)
+    db_user = User(username=user.username, email=user.email, full_name=user.full_name, password=user.password, role=user.role)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
