@@ -1,11 +1,17 @@
 from pydantic import BaseModel
 
+from app.enums import UserRoleEnum
+
 class UserBase(BaseModel):
     username: str
     email: str
 
-class UserCreate(UserBase):
+class UserCreate(BaseModel):
+    username: str
+    email: str
     password: str
+    full_name: str
+    role: UserRoleEnum
 
 class User(UserBase):
     id: int

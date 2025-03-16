@@ -6,3 +6,5 @@ pydantic
 sqlalchemy
 alembic
 python-dotenv
+loguru
+python-jose
