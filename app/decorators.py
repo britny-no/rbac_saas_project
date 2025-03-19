@@ -1,10 +1,11 @@
-import os
 from fastapi import Depends, HTTPException, Request
 from fastapi.security import OAuth2PasswordBearer
 from functools import wraps
 from typing import List
 from jose import JWTError, jwt
+
 from app.enums import UserRoleEnum
+from app.config import settings
 
 def role_required(allowed_roles: List[UserRoleEnum]):
     def decorator(func):
@@ -15,12 +16,12 @@ def role_required(allowed_roles: List[UserRoleEnum]):
                 raise HTTPException(status_code=400, detail="Request object is missing")
 
             try:
-                cookie_key = os.environ.get('COOKIE_KEY')
+                cookie_key = settings.cookie_key
                 token = request.cookies.get(cookie_key)
                 if not token:
                     raise HTTPException(status_code=401, detail="Not authenticated")
 
-                payload = jwt.decode(token, os.environ.get('JWT_SECRET_KEY'), algorithms=[os.environ.get('JWT_ALGORITHM')])
+                payload = jwt.decode(token, settings.jwt_secret_key, algorithms=[settings.jwt_algorithm])
                 role = payload.get("role")
                 if role not in [r.value for r in allowed_roles]:
                     raise HTTPException(status_code=403, detail="Not authorized")
