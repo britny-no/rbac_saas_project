@@ -17,7 +17,7 @@ def role_required(allowed_roles: List[UserRoleEnum]):
 
             try:
                 cookie_key = settings.cookie_key
-                token = request.cookies.get(cookie_key)
+                token = await request.cookies.get(cookie_key)
                 if not token:
                     raise HTTPException(status_code=401, detail="Not authenticated")
 

@@ -24,7 +24,7 @@ def test_get_user_not_found():
 def test_get_user_success():
     # Given
     db = MagicMock(spec=Session)
-    mock_user = User(id=1, username="testuser", email="test@example.com")
+    mock_user = User(id=1, name="testuser", email="test@example.com")
 
     # When
     db.query().filter().first.return_value = mock_user
