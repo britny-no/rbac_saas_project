@@ -4,10 +4,10 @@ from functools import wraps
 from typing import List
 from jose import JWTError, jwt
 
-from app.enums import UserRoleEnum
+from app.enums import RoleEnum
 from app.config import settings
 
-def role_required(allowed_roles: List[UserRoleEnum]):
+def required_role(allowed_roles: List[RoleEnum]):
     def decorator(func):
         @wraps(func)
         async def wrapper(*args, **kwargs):

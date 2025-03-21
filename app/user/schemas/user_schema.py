@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from app.enums import UserRoleEnum
+from app.enums import RoleEnum
 
 class UserBase(BaseModel):
     name: str
@@ -10,7 +10,7 @@ class UserCreate(BaseModel):
     name: str
     email: str
     password: str
-    role: UserRoleEnum
+    role: RoleEnum
 
 class User(UserBase):
     id: int

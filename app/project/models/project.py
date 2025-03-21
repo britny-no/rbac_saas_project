@@ -3,15 +3,13 @@ from sqlalchemy.orm import validates
 from app.database import Base
 
 
-class User(Base):
-    __tablename__ = 'user'
+class Project(Base):
+    __tablename__ = 'project'
     __table_args__ = (
-        {"comment": "유저"},
+        {"comment": "프로젝트"},
     )
 
     id = Column(BigInteger, primary_key=True, comment='인덱스')
-    email = Column(String(50), unique=True, index=True, comment='이메일')
-    password = Column(String(100), comment='비밀번호')
     name = Column(String(20), unique=False, index=False, comment='이름')
     create_at = Column(DateTime, nullable=False, server_default=func.now(), comment='생성일')
     update_at = Column(DateTime, nullable=False, server_default=func.now(), onupdate=func.now(), comment='수정일')

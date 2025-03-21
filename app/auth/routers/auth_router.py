@@ -4,18 +4,18 @@ from fastapi.responses import JSONResponse
 from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import Session
 
-from app.decorators import role_required
+from app.decorators import required_role
 from app.dependencies import get_db
 from app.auth.schemas.auth_schema import LoginRequest, SignUpRequest
 from app.auth.services import auth_service
-from app.enums import UserRoleEnum
+from app.enums import RoleEnum
 
 router = APIRouter()
 
 COOKIE_EXPIRE_MINUTES = int(os.environ.get('COOKIE_EXPIRE_MINUTES', 30))
 
 @router.get("/auth/check")
-@role_required([UserRoleEnum.USER])
+@required_role([RoleEnum.USER])
 async def check(request: Request):
     return "1"
 

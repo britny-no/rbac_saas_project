@@ -5,11 +5,11 @@ from fastapi import HTTPException, Request
 from jose import jwt
 from unittest.mock import AsyncMock
 
-from app.decorators import role_required
+from app.decorators import required_role
 from app.config import settings
-from app.enums import UserRoleEnum
+from app.enums import RoleEnum
 
-@role_required([UserRoleEnum.ADMIN])
+@required_role([RoleEnum.ADMIN])
 async def sample_handler(request: Request):
     return {"message": "Success"}
 
@@ -36,6 +36,7 @@ async def test_invalid_role():
     assert exc_info.value.detail == "Not authorized"
 
 @pytest.mark.asyncio
+@pytest.mark.description("토큰 없을경우 에러 뱉기")
 async def test_no_token():
     request = AsyncMock()
     request.cookies.get.return_value = None
@@ -47,6 +48,7 @@ async def test_no_token():
     assert exc_info.value.detail == "Not authenticated"
 
 @pytest.mark.asyncio
+@pytest.mark.description("유효하지 않은 토큰일 경우 에러 뱉기")
 async def test_invalid_token():
     request = AsyncMock()
     request.cookies.get.return_value = "invalid_token"
@@ -58,6 +60,7 @@ async def test_invalid_token():
     assert exc_info.value.detail == "Invalid token"
 
 @pytest.mark.asyncio
+@pytest.mark.description("요청 객체가 없을 경우 에러 뱉기")
 async def test_missing_request_object():
     with pytest.raises(HTTPException) as exc_info:
         await sample_handler()
