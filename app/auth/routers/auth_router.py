@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import Session
 
+from app.config import settings
 from app.decorators import required_role
 from app.dependencies import get_db
 from app.auth.schemas.auth_schema import LoginRequest, SignUpRequest
@@ -12,10 +13,9 @@ from app.enums import RoleEnum
 
 router = APIRouter()
 
-COOKIE_EXPIRE_MINUTES = int(os.environ.get('COOKIE_EXPIRE_MINUTES', 30))
 
 @router.get("/auth/check")
-@required_role([RoleEnum.USER])
+# @required_role([RoleEnum.USER])
 async def check(request: Request):
     return "1"
 
@@ -31,11 +31,11 @@ def login(login_request: LoginRequest, db: Session = Depends(get_db)):
     # JWT 토큰을 쿠키에 설정
     response = JSONResponse(content={"message": "Login successful"})
     response.set_cookie(
-        key=os.environ.get('COOKIE_KEY'), 
+        key=settings.cookie_key, 
         value=access_token, 
         httponly=True,  # JavaScript에서 접근할 수 없게 설정
         secure=False,    # HTTPS에서만 전송되도록 설정 (배포 시 필수)
-        max_age=timedelta(minutes=COOKIE_EXPIRE_MINUTES),
-        expires=datetime.utcnow().replace(tzinfo=timezone.utc) + timedelta(minutes=COOKIE_EXPIRE_MINUTES)  # 쿠키 만료 시간
+        max_age=timedelta(minutes=settings.cookie_expire_minutes),
+        expires=datetime.utcnow().replace(tzinfo=timezone.utc) + timedelta(minutes=settings.cookie_expire_minutes)  # 쿠키 만료 시간
     )
     return response

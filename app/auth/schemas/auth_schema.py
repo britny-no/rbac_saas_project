@@ -8,9 +8,7 @@ class LoginRequest(BaseModel):
 
 
 class SignUpRequest(BaseModel):
-    username: str
+    name: str
     email: str
     password: str
-    full_name: str
-    role: RoleEnum
 

@@ -1,5 +1,5 @@
 from sqlalchemy import Column, BigInteger, String, DateTime, func, TIMESTAMP, ForeignKeyConstraint
-from sqlalchemy.orm import validates
+from sqlalchemy.orm import validates, relationship
 from app.database import Base
 
 
@@ -20,6 +20,9 @@ class UserProject(Base):
     project_id = Column(BigInteger, nullable=False, index=True, comment="인덱스")
     role = Column(String(20), default="viewer", nullable=False, comment="역할")
     create_at = Column(DateTime, nullable=False, server_default=func.now(), comment='생성일')
+
+    user = relationship("User", back_populates="projects")
+    project = relationship("Project", back_populates="users")
 
     def __repr__(self):
         return (
