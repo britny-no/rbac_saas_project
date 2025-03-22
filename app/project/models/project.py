@@ -1,5 +1,5 @@
 from sqlalchemy import Column, BigInteger, String, DateTime, func
-from sqlalchemy.orm import validates
+from sqlalchemy.orm import validates, relationship
 from app.database import Base
 
 
@@ -16,7 +16,7 @@ class Project(Base):
     delete_at = Column(DateTime, nullable=True, comment='삭제일')
 
 
-    users = relationship("UserProject", back_populates="project")
+    users = relationship("UserProject",  back_populates="project")
 
     def as_dict(self):
         return {column.name: getattr(self, column.name) for column in self.__table__.columns}

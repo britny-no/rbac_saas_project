@@ -1,17 +1,25 @@
 from fastapi import HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from ..models.user import User
+from ..models.user_project import UserProject
 from ..schemas.user_schema import UserCreate
 
 def get_user(db: Session, email: str):
-    db_user = db.query(User).filter(User.email == email).first()
-    # INNER JOIN 기본 사용
-    db_user_with_projects = db.query(User, UserProject).join(UserProject).filter(User.email == email).first()
-    print(db_user_with_projects)
-    if db_user is None:
+    user_with_projects = (
+        db.query(User)
+        .options(joinedload(User.projects))  # Eager loading
+        .filter(User.email == email)
+        .first()
+    )
+    print(user_with_projects)
+    print(f"User: {user_with_projects.name}")
+    for project in user_with_projects.projects:
+        print(f"Project: {project.title}")
+
+    if user_with_projects is None:
         raise HTTPException(status_code=404, detail="User not found")
-    return db_user
+    return user_with_projects
 
 def create_user(db: Session, user: UserCreate):
     db_user = User(name=user.name, email=user.email,  password=user.password)

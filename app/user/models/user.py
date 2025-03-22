@@ -18,6 +18,6 @@ class User(Base):
     delete_at = Column(DateTime, nullable=True, comment='삭제일')
 
     projects = relationship("UserProject", back_populates="user")
-    
+
     def as_dict(self):
         return {column.name: getattr(self, column.name) for column in self.__table__.columns}
