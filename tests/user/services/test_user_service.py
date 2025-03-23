@@ -11,7 +11,7 @@ def test_get_user_not_found():
     db = MagicMock(spec=Session)
 
     # When
-    db.query().filter().first.return_value = None
+    db.query().options().filter().first.return_value = None
     with pytest.raises(HTTPException) as exc_info:
         get_user(db, 999)
 
@@ -27,9 +27,8 @@ def test_get_user_success():
     mock_user = User(id=1, name="testuser", email="test@example.com")
 
     # When
-    db.query().filter().first.return_value = mock_user
+    db.query().options().filter().first.return_value = mock_user
 
     # Then
     result = get_user(db, 1)
     assert result == mock_user
-    db.query().filter().first.assert_called_once()

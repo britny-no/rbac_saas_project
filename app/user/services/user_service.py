@@ -12,10 +12,6 @@ def get_user(db: Session, email: str):
         .filter(User.email == email)
         .first()
     )
-    print(user_with_projects)
-    print(f"User: {user_with_projects.name}")
-    for project in user_with_projects.projects:
-        print(f"Project: {project.title}")
 
     if user_with_projects is None:
         raise HTTPException(status_code=404, detail="User not found")
