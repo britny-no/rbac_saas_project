@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from app.config import settings
 from app.decorators import required_role
 from app.dependencies import get_db
-from app.auth.schemas.auth_schema import LoginRequest, SignUpRequest
+from app.auth.schemas.auth_schema import LoginRequest, SignUpRequest, SignUpResponse
 from app.auth.services import auth_service
 from app.enums import RoleEnum
 
@@ -19,9 +19,10 @@ router = APIRouter()
 async def check(request: Request):
     return "1"
 
-@router.post("/auth/sign-up")
+@router.post("/auth/sign-up", response_model = SignUpResponse)
 def sign_up(sign_up_request: SignUpRequest, db: Session = Depends(get_db)):
-    auth_service.sign_up(db, sign_up_request)
+    user = auth_service.sign_up(db, sign_up_request)
+    return user
 
 
 @router.post("/auth/login")

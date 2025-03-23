@@ -14,7 +14,6 @@ logger = get_logger("ContextManager")
 def transaction(db: Session):
     try:
         yield db
-        db.commit() 
     except SQLAlchemyError as e:
         db.rollback()
         raise e
