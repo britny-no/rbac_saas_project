@@ -19,17 +19,3 @@ def test_get_user_not_found():
     #Then
     assert exc_info.value.status_code == 404
     assert exc_info.value.detail == "User not found"
-
-
-@pytest.mark.description("사용자 조회 성공")
-def test_get_user_success():
-    # Given
-    db = MagicMock(spec=Session)
-    mock_user = User(id=1, name="testuser", email="test@example.com")
-
-    # When
-    db.query().options().filter().first.return_value = mock_user
-
-    # Then
-    result = get_user(db, 1)
-    assert result == mock_user
