@@ -17,6 +17,6 @@ class Project(Base):
 
 
     users = relationship("UserProject",  back_populates="project")
-
+    
     def as_dict(self):
         return {column.name: getattr(self, column.name) for column in self.__table__.columns}

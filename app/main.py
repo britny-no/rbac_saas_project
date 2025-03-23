@@ -5,6 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from fastapi import HTTPException, Depends
 
 from app.exceptions import sqlalchemy_exception_handler, http_exception_handler
+from app.project.routers.project_router import router as project_router
 from app.user.routers.user_router import router as user_router
 from app.auth.routers.auth_router import router as auth_router
 from app.config import settings
@@ -21,6 +22,7 @@ app = FastAPI()
 app.add_exception_handler(SQLAlchemyError, sqlalchemy_exception_handler)
 app.add_exception_handler(HTTPException, http_exception_handler)
 
+app.include_router(project_router)
 app.include_router(user_router)
 app.include_router(auth_router)
 

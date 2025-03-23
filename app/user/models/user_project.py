@@ -29,3 +29,12 @@ class UserProject(Base):
             f"<UserProject(id={self.id}, user_id={self.user_id}, "
             f"project_id={self.project_id}, role={self.role}, create_at={self.create_at})>"
         )
+
+    def as_dict(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "project_id": self.project_id,
+            "role": self.role,
+            "create_at": self.create_at,
+        }

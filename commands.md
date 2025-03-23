@@ -38,7 +38,7 @@ alembic downgrade -1
 
 ## 테스트 코드 명령어
 
-PYTHONPATH=. pytest tests
+PYTHONPATH=. pytest tests -s
 
 ## 개발 서버
 
