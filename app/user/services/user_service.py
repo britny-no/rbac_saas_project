@@ -6,7 +6,7 @@ from app.user.models.user import User
 from app.user.models.user_project import UserProject
 from app.user.schemas.user_schema import UserCreate
 
-def get_user(db: Session, email: str) -> User:
+def get_user_with_project(db: Session, email: str) -> User:
     user_with_projects = (
         db.query(User)
         .options(joinedload(User.projects))
