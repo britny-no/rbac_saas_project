@@ -6,6 +6,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime, timedelta, timezone
 
 from app.enums import RoleEnum
+from app.vo import UserClaims
 from app.config import settings
 from app.user.models.user_project import UserProject
 from app.user.models.user import User
@@ -142,13 +143,31 @@ class TestLogin:
         assert result
 
 class TestCreateAccessToken:
-    @pytest.fixture
-    def mock_data(self):
-        return {"user_id": 1}
-
+    @pytest.mark.description("참여 프로젝트 없을 경우 토큰 생성 성공")
     @patch("jose.jwt.encode")
-    def test_create_access_token(self, mock_encode, mock_data):
+    def test_create_access_token(self, mock_encode):
         # Given
+        mock_data = UserClaims(id=1, project_roles={})
+        mock_encode.return_value = "mocked_token"
+
+        # When
+        token = auth_service.create_access_token(mock_data)
+        to_encode_arg = mock_encode.call_args[0][0]
+
+        # Then
+        assert "exp" in to_encode_arg
+        exp = to_encode_arg["exp"]
+        
+        expected_exp = datetime.utcnow().replace(tzinfo=timezone.utc) + timedelta(minutes=int(settings.jwt_expire_minutes))
+        assert abs((exp - expected_exp).total_seconds()) < 5 
+
+        assert token == "mocked_token"
+
+    @pytest.mark.description("참여 프로젝트 있을 경우 토큰 생성 성공")
+    @patch("jose.jwt.encode")
+    def test_create_access_token(self, mock_encode):
+        # Given
+        mock_data = UserClaims(id=1, project_roles={1: RoleEnum.VIEWER})
         mock_encode.return_value = "mocked_token"
 
         # When

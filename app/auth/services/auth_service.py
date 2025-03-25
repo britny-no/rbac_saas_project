@@ -6,10 +6,10 @@ from jose import JWTError, jwt
 from datetime import datetime, timedelta, timezone
 
 from app.config import settings
+from app.vo import UserClaims
 from app.user.models.user import User
 from app.user.services import user_service
 from app.auth.schemas.auth_schema import LoginRequest, SignUpRequest
-
 
 
 def sign_up(db: Session, sign_up_request: SignUpRequest) -> User:
@@ -22,18 +22,15 @@ def login(db: Session, login_request: LoginRequest) -> str:
         raise HTTPException(status_code=400, detail="Incorrect username or password")
         
     project_roles = {project.id: project.role for project in user.projects}
-
-    access_token = create_access_token(data={
-        "id": user.id,
-        "project_roles": project_roles
-    })
+    user_claims = UserClaims(id=user.id, project_roles=project_roles)
+    access_token = create_access_token(user_claims=user_claims)
     
     return access_token
 
-def create_access_token(data: dict):
-    to_encode = data.copy()
+def create_access_token(user_claims: UserClaims):
+    to_dict = user_claims.dict()
     expires_delta = timedelta(minutes=int(settings.jwt_expire_minutes))
     expire = datetime.utcnow().replace(tzinfo=timezone.utc)+ expires_delta
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, settings.jwt_secret_key, algorithm=settings.jwt_algorithm)
+    to_dict.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_dict, settings.jwt_secret_key, algorithm=settings.jwt_algorithm)
     return encoded_jwt
