@@ -14,9 +14,9 @@ from app.enums import RoleEnum
 router = APIRouter()
 
 
-@router.get("/auth/check")
+@router.get("/auth/check/{project_id}")
 @required_role([RoleEnum.VIEWER])
-async def check(request: Request):
+def check(request: Request, project_id: int):
     return "1"
 
 @router.post("/auth/sign-up", response_model = SignUpResponse)

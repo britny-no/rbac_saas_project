@@ -20,27 +20,21 @@ class TestSignUp:
     def mock_db_session(self):
         return MagicMock(spec=Session)
 
-    @pytest.fixture
-    def mock_sign_up_request(self):
-        return SignUpRequest(
-            name="testuser",
-            password="password123",
-            email="testuser@example.com"
-        )
 
-    @pytest.fixture
-    def mock_user(self):
-        return User(
+    @pytest.mark.description("유저 서비스 에러로 예외 발생")
+    @patch("app.user.services.user_service.create_user")
+    def test_create_user_error(self, mock_create_user, mock_db_session):
+        # Given
+        mock_user = User(
             id=1,
             name="testuser",
             email="testuser@example.com",
         )
-
-
-    @pytest.mark.description("유저 서비스 에러로 예외 발생")
-    @patch("app.user.services.user_service.create_user")
-    def test_create_user_error(self, mock_create_user, mock_db_session, mock_sign_up_request, mock_user):
-        # Given
+        mock_sign_up_request = SignUpRequest(
+            name="testuser",
+            password="password123",
+            email="testuser@example.com"
+        )
         mock_create_user.side_effect = Exception("General service error")
         
         # When
@@ -52,8 +46,18 @@ class TestSignUp:
 
     @pytest.mark.description("회원가입 성공")
     @patch("app.user.services.user_service.create_user")
-    def test_success(self, mock_create_user, mock_db_session, mock_sign_up_request, mock_user):
+    def test_success(self, mock_create_user, mock_db_session):
         # Given
+        mock_user = User(
+            id=1,
+            name="testuser",
+            email="testuser@example.com",
+        )
+        mock_sign_up_request = SignUpRequest(
+            name="testuser",
+            password="password123",
+            email="testuser@example.com"
+        )
         mock_create_user.return_value = mock_user
         
         # When
@@ -68,32 +72,14 @@ class TestLogin:
     def mock_db_session(self):
         return MagicMock(spec=Session)
 
-    @pytest.fixture
-    def mock_login_request(self):
-        return LoginRequest(
+    @pytest.mark.description("유저 서비스 에러로 예외 발생")
+    @patch("app.user.services.user_service.get_user_with_project")
+    def test_error_when_user_service_error(self, mock_get_user_with_project, mock_db_session):
+        # Given
+        mock_login_request = LoginRequest(
             email="testuser@example.com",
             password="password123",
         )
-
-    @pytest.fixture
-    def mock_user(self):
-        project = UserProject(
-            id = 1,
-            user_id = 1,
-            role = RoleEnum.VIEWER
-        )
-        return User(
-            id=1,
-            name="testuser",
-            email="testuser@example.com",
-            password = "password123",
-            projects = [project]
-        )
-
-    @pytest.mark.description("유저 서비스 에러로 예외 발생")
-    @patch("app.user.services.user_service.get_user_with_project")
-    def test_error_when_user_service_error(self, mock_get_user_with_project, mock_db_session, mock_login_request):
-        # Given
         mock_get_user_with_project.side_effect = Exception("General service error")
         
         # When
@@ -108,12 +94,7 @@ class TestLogin:
     @patch("app.user.services.user_service.get_user_with_project")
     def test_error_when_user_not_found(self, mock_get_user_with_project, mock_db_session):
         # Given
-        mock_user = User(
-            id=1,
-            name="testuser",
-            email="testuser@example.com",
-            password="wrong_password",
-        )
+        mock_user = None
         mock_login_request = LoginRequest(
             email="testuser@example.com",
             password="password123",
@@ -131,8 +112,25 @@ class TestLogin:
 
     @pytest.mark.description("로그인 성공")
     @patch("app.user.services.user_service.get_user_with_project")
-    def test_success(self, mock_get_user_with_project, mock_db_session, mock_login_request, mock_user):
+    def test_success(self, mock_get_user_with_project, mock_db_session):
         # Given
+        project = UserProject(
+            id = 1,
+            project_id = 1,
+            user_id = 1,
+            role = RoleEnum.VIEWER
+        )
+        mock_user = User(
+            id=1,
+            name="testuser",
+            email="testuser@example.com",
+            password = "password123",
+            projects = [project]
+        )
+        mock_login_request = LoginRequest(
+            email="testuser@example.com",
+            password="password123",
+        )
         mock_get_user_with_project.return_value = mock_user
 
         # When

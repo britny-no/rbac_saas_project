@@ -20,8 +20,8 @@ def login(db: Session, login_request: LoginRequest) -> str:
     user = user_service.get_user_with_project(db, login_request.email)
     if not user or user.password != login_request.password:
         raise HTTPException(status_code=400, detail="Incorrect username or password")
-        
-    project_roles = {project.id: project.role for project in user.projects}
+
+    project_roles = {project.project_id: project.role for project in user.projects}
     user_claims = UserClaims(id=user.id, project_roles=project_roles)
     access_token = create_access_token(user_claims=user_claims)
     
