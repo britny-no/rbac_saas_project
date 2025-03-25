@@ -15,7 +15,7 @@ router = APIRouter()
 
 
 @router.get("/auth/check")
-# @required_role([RoleEnum.USER])
+@required_role([RoleEnum.VIEWER])
 async def check(request: Request):
     return "1"
 

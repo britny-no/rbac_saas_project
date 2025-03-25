@@ -23,10 +23,12 @@ class TestGetUserWithProject:
         )
 
 
-    @pytest.mark.description("사용자가 없을 경우 404 에외 발생")
+    @pytest.mark.description("사용자가 없을 경우 404 예외 발생")
     def test_error_when_user_not_found(self, mock_db_session):
-        # When
+        # Given
         mock_db_session.query().options().filter().first.return_value = None
+        
+        # When
         with pytest.raises(HTTPException) as exc_info:
             user_service.get_user_with_project(mock_db_session, 999)
 
@@ -37,11 +39,9 @@ class TestGetUserWithProject:
     @pytest.mark.description("유저 조회중 db 에러 발생할 경우 예외 발생")
     def test_error_when_db_error(self, mock_db_session):
         # Given
-        
-        # When
         mock_db_session.query().options().filter().first.side_effect = SQLAlchemyError("Database error")
 
-        # Then
+        # When & Then
         with pytest.raises(SQLAlchemyError) as exc_info:
             user_service.get_user_with_project(mock_db_session, "nonexistent-email@example.com")
         
@@ -50,11 +50,12 @@ class TestGetUserWithProject:
     @pytest.mark.description("조회 성공")
     def test_success(self, mock_db_session, mock_user):
         # Given
-        # When
         mock_db_session.query().options().filter().first.return_value = mock_user
 
-        # Then
+        # When
         result = user_service.get_user_with_project(mock_db_session, 1)
+        
+        # Then
         assert result == mock_user
 
 class TestGetUserWithProject:
@@ -76,24 +77,27 @@ class TestGetUserWithProject:
 
     @pytest.mark.description("유저 생성중 db 에러 발생할 경우 예외 발생")
     def test_create_user_db_error(self, mock_db_session, mock_user_create):
-        # When
+        # Given
         mock_db_session.add.side_effect = SQLAlchemyError("Database error")
         mock_db_session.commit.side_effect = SQLAlchemyError("Database error")
 
-        # Then
+        # When
         with pytest.raises(SQLAlchemyError) as exc_info:
             user_service.create_user(mock_db_session, mock_user_create)
         
+        # Then
         assert exc_info.value.args[0] == "Database error"
 
     @pytest.mark.description("사용자 생성 성공")
     def test_create_user_success(self, mock_db_session, mock_user_create):
-        # When
+        # Given
         mock_db_session.add.return_value = None 
         mock_db_session.commit.return_value = None
         
-        # Then
+        # When
         result = user_service.create_user(mock_db_session, mock_user_create)
+        
+        # Then
         assert result.name == "test project"
         assert result.email == "test@naver.com"
         assert result.password == "123"

@@ -23,14 +23,14 @@ class TestCreateProject:
         #Given
         mock_user_id = 1
 
-        # When
         mock_db_session.add.side_effect = SQLAlchemyError("Database error")
         mock_db_session.commit.side_effect = SQLAlchemyError("Database error")
 
-        # Then
+        # When
         with pytest.raises(SQLAlchemyError) as exc_info:
             project_service.create_project(mock_db_session, mock_user_id, mock_create_project_request)
         
+        # Then
         assert exc_info.value.args[0] == "Database error"
 
 
@@ -39,12 +39,12 @@ class TestCreateProject:
         #Given
         mock_user_id = 1
 
-        # When
         mock_db_session.add.return_value = None 
         mock_db_session.commit.return_value = None
 
-        # Then
+        # When
         result = project_service.create_project(mock_db_session, mock_user_id, mock_create_project_request)
 
+        # Then
         assert result.name == "test project"
         assert result.users[0].user_id ==  1
