@@ -10,6 +10,7 @@ from app.dependencies import get_db
 from app.auth.schemas.auth_schema import LoginRequest, SignUpRequest, SignUpResponse
 from app.auth.services import auth_service
 from app.enums import RoleEnum
+from app.auth.dependencies import get_verify_code_repository
 
 router = APIRouter()
 
@@ -20,7 +21,7 @@ def check(request: Request, project_id: int):
     return "1"
 
 @router.post("/auth/sign-up", response_model = SignUpResponse)
-def sign_up(sign_up_request: SignUpRequest, db: Session = Depends(get_db)):
+def sign_up(sign_up_request: SignUpRequest, db: Session = Depends(get_db), VerifyCodeRepository = Depends(get_verify_code_repository)):
     user = auth_service.sign_up(db, sign_up_request)
     return user
 
