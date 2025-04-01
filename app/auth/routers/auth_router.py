@@ -21,7 +21,7 @@ def check(request: Request, project_id: int):
     return "1"
 
 @router.post("/auth/sign-up", response_model = SignUpResponse)
-def sign_up(sign_up_request: SignUpRequest, db: Session = Depends(get_db), VerifyCodeRepository = Depends(get_verify_code_repository)):
+def sign_up(sign_up_request: SignUpRequest, db: Session = Depends(get_db), verify_code_repository = Depends(get_verify_code_repository)):
     user = auth_service.sign_up(db, sign_up_request)
     return user
 
