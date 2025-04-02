@@ -10,7 +10,7 @@ from app.dependencies import get_db
 from app.auth.schemas.auth_schema import LoginRequest, SignUpRequest, SignUpResponse
 from app.auth.services import auth_service
 from app.enums import RoleEnum
-from app.auth.dependencies import get_verify_code_repository
+from app.verify_code.dependencies import get_verify_code_repository
 
 router = APIRouter()
 

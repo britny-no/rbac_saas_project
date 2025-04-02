@@ -6,8 +6,13 @@ from .verify_code_repository import VerifyCodeRepository
 
 
 class InMemoryVerifyCodeRepository(VerifyCodeRepository):
-    def __init__(self, max_cache_size: int = 100, ttl_seconds: int = 180):
-        self.storage = TTLCache(maxsize=max_cache_size, ttl=ttl_seconds)
+    _instance = None
+
+    def __new__(cls, max_cache_size: int = 100, ttl_seconds: int = 180):
+        if not cls._instance:
+            cls._instance = super(InMemoryVerifyCodeRepository, cls).__new__(cls)
+            cls._instance.storage = TTLCache(maxsize=max_cache_size, ttl=ttl_seconds)
+        return cls._instance
 
     def save(self, key: str) -> str:
         value = self._generate_random_number()
@@ -16,7 +21,7 @@ class InMemoryVerifyCodeRepository(VerifyCodeRepository):
 
     def get(self, key: str) -> str:
         result = self.storage.get(key)
-        
+
         if result is None:
             raise HTTPException(status_code=400, detail="no value")
         

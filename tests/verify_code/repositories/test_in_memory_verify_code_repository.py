@@ -4,7 +4,7 @@ from time import sleep
 from unittest.mock import MagicMock
 from fastapi import HTTPException
 
-from app.auth.repositories import InMemoryVerifyCodeRepository
+from app.verify_code.repositories import InMemoryVerifyCodeRepository
 
 class TestInMemoryVerifyCodeRepository(unittest.TestCase):
 
