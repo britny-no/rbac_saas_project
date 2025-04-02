@@ -9,3 +9,5 @@ python-dotenv
 loguru
 python-jose
 cachetools
+async_timeout
+backoff

@@ -9,10 +9,23 @@ services:
       POSTGRES_DB: fastapi_db
     ports:
       - "5432:5432"
-  # app:
-  #   build: .
-  #   container_name: fastapi_app
-  #   ports:
-  #     - "8000:8000"
-  #   depends_on:
-  #     - db
+    # app:
+    #   build: .
+    #   container_name: fastapi_app
+    #   ports:
+    #     - "8000:8000"
+    #   depends_on:
+    #     - db
+
+  redis:
+    container_name: redis
+    image: redis:7.2.4-alpine
+    expose:
+      - "6379"
+    ports: # 바인딩할 포트:내부 포트
+      - 6379:6379
+    volumes: # 마운트할 볼륨 설정
+      - ./redis/data:/data
+      - ./redis/redis.conf:/etc/redis/redis.conf
+    restart: always
+    command: redis-server /etc/redis/redis.conf
