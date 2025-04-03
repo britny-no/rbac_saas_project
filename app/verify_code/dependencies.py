@@ -1,4 +1,4 @@
-from .repositories import VerifyCodeRepository, InMemoryVerifyCodeRepository
+from .repositories import VerifyCodeRepository, RedisVerifyCodeRepository
 
 def get_verify_code_repository() -> VerifyCodeRepository:
-    return InMemoryVerifyCodeRepository()
+    return RedisVerifyCodeRepository()

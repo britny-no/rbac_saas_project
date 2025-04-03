@@ -5,12 +5,12 @@ from cachetools import TTLCache
 from .verify_code_repository import VerifyCodeRepository
 
 
-class InMemoryVerifyCodeRepository(VerifyCodeRepository):
+class RedisVerifyCodeRepository(VerifyCodeRepository):
     _instance = None
 
     def __new__(cls, max_cache_size: int = 100, ttl_seconds: int = 180):
         if not cls._instance:
-            cls._instance = super(InMemoryVerifyCodeRepository, cls).__new__(cls)
+            cls._instance = super(RedisVerifyCodeRepository, cls).__new__(cls)
             cls._instance.storage = TTLCache(maxsize=max_cache_size, ttl=ttl_seconds)
         return cls._instance
 

@@ -4,12 +4,12 @@ from time import sleep
 from unittest.mock import MagicMock
 from fastapi import HTTPException
 
-from app.verify_code.repositories import InMemoryVerifyCodeRepository
+from app.verify_code.repositories import RedisVerifyCodeRepository
 
-class TestInMemoryVerifyCodeRepository(unittest.TestCase):
+class TestRedisVerifyCodeRepository(unittest.TestCase):
 
     def setUp(self):
-        self.repo = InMemoryVerifyCodeRepository(max_cache_size=1, ttl_seconds=1)
+        self.repo = RedisVerifyCodeRepository(max_cache_size=1, ttl_seconds=1)
 
 
     @pytest.mark.description("저장 성공")

@@ -1,2 +1,3 @@
 from .verify_code_repository import VerifyCodeRepository
-from .in_memory_verify_code_repository import InMemoryVerifyCodeRepository
+from .redis_verify_code_repository import RedisVerifyCodeRepository
+from .memory_verify_code_repository import MemoryVerifyCodeRepository
