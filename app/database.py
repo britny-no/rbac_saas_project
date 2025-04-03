@@ -1,50 +1,61 @@
 import asyncio
 from sqlalchemy import create_engine
-from sqlalchemy.orm import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, declarative_base
 from sqlalchemy.sql import text
 
 from app.config import settings
+from app.logging_config import get_logger
 
-
-if not settings.sqlalchemy_database_url:
-    raise ValueError("SQLALCHEMY_DATABASE_URL not set")
-
-
-engine = create_engine(
-    settings.sqlalchemy_database_url,
-    pool_size=10,
-    max_overflow=5,
-    pool_recycle=1,
-    pool_pre_ping=True 
-)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine, expire_on_commit=False)
+logger = get_logger("DatabaseManager")
 Base = declarative_base()
 
-async def check_db_connection():
-    global engine, SessionLocal
+class DatabaseManager:
+    def __init__(self, db_url: str):
+        if not db_url:
+            raise ValueError("SQLALCHEMY_DATABASE_URL not set")
 
-    while True:
+        self.db_url = db_url
+        self.engine = self._create_engine()
+        self.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self.engine, expire_on_commit=False)
+        self.is_reconnecting = False 
+        self.initialize_database()
+
+
+    def _create_engine(self):
+        return create_engine(
+            self.db_url,
+            pool_size=10,
+            max_overflow=5,
+            pool_recycle=1,
+            pool_pre_ping=True
+        )
+
+    def initialize_database(self):
+        Base.metadata.create_all(bind=self.engine)
+
+    async def reconnect(self):
+        if self.is_reconnecting:
+            return
+        
+        self.is_reconnecting = True
         try:
-            with engine.connect() as conn:
-                conn.execute(text("SELECT 1")) 
+            self.engine.dispose()
+            self.engine = self._create_engine()
+            self.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self.engine, expire_on_commit=False)
         except Exception as e:
-            print(e)
-            print("🔴 DB 연결 끊김! 연결 시도...")
-            reconnect()
-        finally:
-            await asyncio.sleep(5) 
+            logger.warn("🔴 DB 연결 실패")
+        self.is_reconnecting = False
+        
 
-def reconnect():
-    global engine, SessionLocal
+    async def check_connection(self):
+        while True:
+            try:
+                with self.engine.connect() as conn:
+                    conn.execute(text("SELECT 1"))
+            except Exception as e:
+                await self.reconnect()
+            finally:
+                await asyncio.sleep(5)
 
-    engine.dispose()
-    engine = create_engine(
-        settings.sqlalchemy_database_url,
-        pool_size=10,
-        max_overflow=5,
-        pool_recycle=1,
-        pool_pre_ping=True 
-    )
-    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine, expire_on_commit=False)
 
+db_manager = DatabaseManager(settings.sqlalchemy_database_url)

@@ -2,13 +2,13 @@ from fastapi import HTTPException, Depends, Request
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
 
-from app.database import SessionLocal
+from app.database import db_manager
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 def get_db():
-    db = SessionLocal()
+    db = db_manager.SessionLocal()
     try:
         yield db
     finally:
