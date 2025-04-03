@@ -36,14 +36,13 @@ class DatabaseManager:
     async def reconnect(self):
         if self.is_reconnecting:
             return
-        
         self.is_reconnecting = True
         try:
             self.engine.dispose()
             self.engine = self._create_engine()
             self.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self.engine, expire_on_commit=False)
         except Exception as e:
-            logger.warn("🔴 DB 연결 실패")
+            pass
         self.is_reconnecting = False
         
 
@@ -53,9 +52,11 @@ class DatabaseManager:
                 with self.engine.connect() as conn:
                     conn.execute(text("SELECT 1"))
             except Exception as e:
+                logger.error("🔴 DB 연결 실패")
                 await self.reconnect()
             finally:
                 await asyncio.sleep(5)
 
+    def close(self):
+        self.engine.dispose()
 
-db_manager = DatabaseManager(settings.sqlalchemy_database_url)
