@@ -13,6 +13,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from app.database import Base
 from app.user.models.user import User
+from app.user.models.user_project import UserProject
+from app.project.models.project import Project
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config

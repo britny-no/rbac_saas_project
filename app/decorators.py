@@ -1,33 +1,47 @@
-import os
 from fastapi import Depends, HTTPException, Request
 from fastapi.security import OAuth2PasswordBearer
 from functools import wraps
 from typing import List
 from jose import JWTError, jwt
-from app.enums import UserRoleEnum
 
-def role_required(allowed_roles: List[UserRoleEnum]):
+from app.enums import RoleEnum
+from app.config import settings
+
+
+def decode_jwt_token(token: str, secret_key: str, algorithm: str) -> dict:
+    try:
+        payload = jwt.decode(token, secret_key, algorithms=[algorithm])
+        return payload
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+
+def required_role(allowed_roles: List[RoleEnum]):
     def decorator(func):
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs):
             request = kwargs.get("request")
-            if request is None:
-                raise HTTPException(status_code=400, detail="Request object is missing")
+            project_id = kwargs.get("project_id")
+            cookie_key = settings.cookie_key
 
-            try:
-                cookie_key = os.environ.get('COOKIE_KEY')
-                token = request.cookies.get(cookie_key)
-                if not token:
-                    raise HTTPException(status_code=401, detail="Not authenticated")
+            if project_id is None or request is None or cookie_key not in  request.cookies:
+                raise HTTPException(status_code=400, detail="Bad Request")
 
-                payload = jwt.decode(token, os.environ.get('JWT_SECRET_KEY'), algorithms=[os.environ.get('JWT_ALGORITHM')])
-                role = payload.get("role")
-                if role not in [r.value for r in allowed_roles]:
-                    raise HTTPException(status_code=403, detail="Not authorized")
+            token = request.cookies.get(cookie_key)
+            if not token:
+                raise HTTPException(status_code=401, detail="Not authenticated")
 
-            except JWTError:
-                raise HTTPException(status_code=401, detail="Invalid token")
+            payload = decode_jwt_token(token, settings.jwt_secret_key, settings.jwt_algorithm)
 
-            return await func(*args, **kwargs)
+            project_roles = payload.get("project_roles")
+            if project_roles is None :
+                raise HTTPException(status_code=400, detail="Bad Request")
+            participated_role = project_roles.get(str(project_id))
+
+            if participated_role not in [r.value for r in allowed_roles]:
+                raise HTTPException(status_code=403, detail="Not authorized")
+
+
+            return func(*args, **kwargs)
         return wrapper
     return decorator

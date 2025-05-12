@@ -1,5 +1,6 @@
 fastapi
 uvicorn
+gunicorn
 SQLAlchemy
 psycopg2-binary
 pydantic
@@ -8,3 +9,5 @@ alembic
 python-dotenv
 loguru
 python-jose
+async_timeout
+backoff

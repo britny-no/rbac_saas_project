@@ -1,6 +1,6 @@
 from pydantic import BaseModel, validator
 
-from app.enums import UserRoleEnum
+from app.enums import RoleEnum
 
 class LoginRequest(BaseModel):
     email: str
@@ -8,9 +8,15 @@ class LoginRequest(BaseModel):
 
 
 class SignUpRequest(BaseModel):
-    username: str
+    name: str
     email: str
     password: str
-    full_name: str
-    role: UserRoleEnum
+
+class SignUpResponse(BaseModel):
+    id: int
+    name: str
+    email: str
+
+    class Config:
+        orm_mode = True
 

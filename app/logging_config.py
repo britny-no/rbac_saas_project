@@ -12,11 +12,30 @@ logger.add(
 )
 
 logger.add(
-    "logs/app.log",
+    "logs/info.log",
     rotation="10 MB",
     retention="7 days",
     compression="zip",
-    serialize=True,  # JSON 직렬화
+    serialize=True,
+    filter=lambda record: record["level"].name == "INFO"
+)
+
+logger.add(
+    "logs/error.log",
+    rotation="10 MB",
+    retention="7 days",
+    compression="zip",
+    serialize=True,
+    filter=lambda record: record["level"].name == "ERROR"
+)
+
+logger.add(
+    "logs/debug.log",
+    rotation="10 MB",
+    retention="7 days",
+    compression="zip",
+    serialize=True,
+    filter=lambda record: record["level"].name == "DEBUG"
 )
 
 def get_logger(name: str):
